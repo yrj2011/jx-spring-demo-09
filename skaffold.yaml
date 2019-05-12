@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/yrj2011/jx-spring-demo-09:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/yrj2011/jx-spring-demo-09:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: jx-spring-demo-09
+        chartPath: charts/jx-spring-demo-09
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/yrj2011/jx-spring-demo-09'
+          image.tag: '{{.DIGEST_HEX}}'
